@@ -6,6 +6,8 @@ from torch import nn
 from torch.nn import CrossEntropyLoss
 import numpy as np
 
+import meta
+
 class FiDT5(transformers.T5ForConditionalGeneration):
     def __init__(self, config):
         super().__init__(config)
@@ -247,106 +249,213 @@ def cross_attention_forward(
 
     return output
 
-class RetrieverConfig(transformers.BertConfig):
+# class RetrieverConfig(transformers.BertConfig):
 
-    def __init__(self,
-                 indexing_dimension=768,
-                 apply_bug_mask=False,
-                 apply_context_mask=False,
-                 extract_cls=False,
-                 context_max_length=450,
-                 bug_max_length=62,
-                 projection=True,
-                 **kwargs):
-        super().__init__(**kwargs)
-        self.indexing_dimension = indexing_dimension
-        self.apply_bug_mask = apply_bug_mask
-        self.apply_context_mask = apply_context_mask
-        self.extract_cls=extract_cls
-        self.context_max_length = context_max_length
-        self.bug_max_length = bug_max_length
-        self.projection = projection
+#     def __init__(self,
+#                  indexing_dimension=768,
+#                  apply_bug_mask=False,
+#                  apply_context_mask=False,
+#                  extract_cls=False,
+#                  context_max_length=450,
+#                  bug_max_length=62,
+#                  projection=True,
+#                  **kwargs):
+#         super().__init__(**kwargs)
+#         self.indexing_dimension = indexing_dimension
+#         self.apply_bug_mask = apply_bug_mask
+#         self.apply_context_mask = apply_context_mask
+#         self.extract_cls=extract_cls
+#         self.context_max_length = context_max_length
+#         self.bug_max_length = bug_max_length
+#         self.projection = projection
+
+
+# use RoBERTa instead of BERT
+class RetrieverConfig(transformers.RobertaConfig):
+        def __init__(self,
+                    indexing_dimension=768,
+                    apply_bug_mask=False,
+                    apply_context_mask=False,
+                    extract_cls=False,
+                    context_max_length=450,
+                    bug_max_length=62,
+                    projection=True,
+                    **kwargs):
+            super().__init__(**kwargs)
+            self.indexing_dimension = indexing_dimension
+            self.apply_bug_mask = apply_bug_mask
+            self.apply_context_mask = apply_context_mask
+            self.extract_cls=extract_cls
+            self.context_max_length = context_max_length
+            self.bug_max_length = bug_max_length
+            self.projection = projection
+
+# class Retriever(transformers.PreTrainedModel):
+
+#     config_class = RetrieverConfig
+#     base_model_prefix = "retriever"
+
+#     def __init__(self, config, initialize_wBERT=False):
+#         super().__init__(config)
+#         assert config.projection or config.indexing_dimension == 768, \
+#             'If no projection then indexing dimension must be equal to 768'
+#         self.config = config
+#         if initialize_wBERT:
+#             self.model = transformers.BertModel.from_pretrained('bert-base-uncased')
+#         else:
+#             self.model = transformers.BertModel(config)
+#         if self.config.projection:
+#             self.proj = nn.Linear(
+#                 self.model.config.hidden_size,
+#                 self.config.indexing_dimension
+#             )
+#             self.norm = nn.LayerNorm(self.config.indexing_dimension)
+#         self.loss_fct = torch.nn.KLDivLoss()
+
+#     def forward(self,
+#                 bug_ids,
+#                 bug_mask,
+#                 context_ids,
+#                 context_mask,
+#                 gold_score=None):
+#         bug_output = self.embed_text(
+#             text_ids=bug_ids,
+#             text_mask=bug_mask,
+#             apply_mask=self.config.apply_bug_mask,
+#             extract_cls=self.config.extract_cls,
+#         )
+#         bsz, n_contexts, plen = context_ids.size()
+#         context_ids = context_ids.view(bsz * n_contexts, plen)
+#         context_mask = context_mask.view(bsz * n_contexts, plen)
+#         context_output = self.embed_text(
+#             text_ids=context_ids,
+#             text_mask=context_mask,
+#             apply_mask=self.config.apply_context_mask,
+#             extract_cls=self.config.extract_cls,
+#         )
+
+#         score = torch.einsum(
+#             'bd,bid->bi',
+#             bug_output,
+#             context_output.view(bsz, n_contexts, -1)
+#         )
+#         score = score / np.sqrt(bug_output.size(-1))
+#         if gold_score is not None:
+#             loss = self.kldivloss(score, gold_score)
+#         else:
+#             loss = None
+
+#         return bug_output, context_output, score, loss
+
+#     def embed_text(self, text_ids, text_mask, apply_mask=False, extract_cls=False):
+#         text_output = self.model(
+#             input_ids=text_ids,
+#             attention_mask=text_mask if apply_mask else None
+#         )
+#         if type(text_output) is not tuple:
+#             text_output.to_tuple()
+#         text_output = text_output[0]
+#         if self.config.projection:
+#             text_output = self.proj(text_output)
+#             text_output = self.norm(text_output)
+
+#         if extract_cls:
+#             text_output = text_output[:, 0]
+#         else:
+#             if apply_mask:
+#                 text_output = text_output.masked_fill(~text_mask[:, :, None], 0.)
+#                 text_output = torch.sum(text_output, dim=1) / torch.sum(text_mask, dim=1)[:, None]
+#             else:
+#                 text_output = torch.mean(text_output, dim=1)
+#         return text_output
+
+#     def kldivloss(self, score, gold_score):
+#         gold_score = torch.softmax(gold_score, dim=-1)
+#         score = torch.nn.functional.log_softmax(score, dim=-1)
+#         return self.loss_fct(score, gold_score)
+
 
 class Retriever(transformers.PreTrainedModel):
-
-    config_class = RetrieverConfig
-    base_model_prefix = "retriever"
-
-    def __init__(self, config, initialize_wBERT=False):
-        super().__init__(config)
-        assert config.projection or config.indexing_dimension == 768, \
-            'If no projection then indexing dimension must be equal to 768'
-        self.config = config
-        if initialize_wBERT:
-            self.model = transformers.BertModel.from_pretrained('bert-base-uncased')
-        else:
-            self.model = transformers.BertModel(config)
-        if self.config.projection:
-            self.proj = nn.Linear(
-                self.model.config.hidden_size,
-                self.config.indexing_dimension
-            )
-            self.norm = nn.LayerNorm(self.config.indexing_dimension)
-        self.loss_fct = torch.nn.KLDivLoss()
-
-    def forward(self,
-                bug_ids,
-                bug_mask,
-                context_ids,
-                context_mask,
-                gold_score=None):
-        bug_output = self.embed_text(
-            text_ids=bug_ids,
-            text_mask=bug_mask,
-            apply_mask=self.config.apply_bug_mask,
-            extract_cls=self.config.extract_cls,
-        )
-        bsz, n_contexts, plen = context_ids.size()
-        context_ids = context_ids.view(bsz * n_contexts, plen)
-        context_mask = context_mask.view(bsz * n_contexts, plen)
-        context_output = self.embed_text(
-            text_ids=context_ids,
-            text_mask=context_mask,
-            apply_mask=self.config.apply_context_mask,
-            extract_cls=self.config.extract_cls,
-        )
-
-        score = torch.einsum(
-            'bd,bid->bi',
-            bug_output,
-            context_output.view(bsz, n_contexts, -1)
-        )
-        score = score / np.sqrt(bug_output.size(-1))
-        if gold_score is not None:
-            loss = self.kldivloss(score, gold_score)
-        else:
-            loss = None
-
-        return bug_output, context_output, score, loss
-
-    def embed_text(self, text_ids, text_mask, apply_mask=False, extract_cls=False):
-        text_output = self.model(
-            input_ids=text_ids,
-            attention_mask=text_mask if apply_mask else None
-        )
-        if type(text_output) is not tuple:
-            text_output.to_tuple()
-        text_output = text_output[0]
-        if self.config.projection:
-            text_output = self.proj(text_output)
-            text_output = self.norm(text_output)
-
-        if extract_cls:
-            text_output = text_output[:, 0]
-        else:
-            if apply_mask:
-                text_output = text_output.masked_fill(~text_mask[:, :, None], 0.)
-                text_output = torch.sum(text_output, dim=1) / torch.sum(text_mask, dim=1)[:, None]
+    
+        config_class = RetrieverConfig
+        base_model_prefix = "retriever"
+    
+        def __init__(self, config, initialize_wBERT=False):
+            super().__init__(config)
+            assert config.projection or config.indexing_dimension == 768, \
+                'If no projection then indexing dimension must be equal to 768'
+            self.config = config
+            if initialize_wBERT:
+                self.model = transformers.RobertaModel.from_pretrained(meta.MODEL_NAME)
             else:
-                text_output = torch.mean(text_output, dim=1)
-        return text_output
+                self.model = transformers.RobertaModel(config)
+            if self.config.projection:
+                self.proj = nn.Linear(
+                    self.model.config.hidden_size,
+                    self.config.indexing_dimension
+                )
+                self.norm = nn.LayerNorm(self.config.indexing_dimension)
+            self.loss_fct = torch.nn.KLDivLoss()
+    
+        def forward(self,
+                    bug_ids,
+                    bug_mask,
+                    context_ids,
+                    context_mask,
+                    gold_score=None):
+            bug_output = self.embed_text(
+                text_ids=bug_ids,
+                text_mask=bug_mask,
+                apply_mask=self.config.apply_bug_mask,
+                extract_cls=self.config.extract_cls,
+            )
+            bsz, n_contexts, plen = context_ids.size()
+            context_ids = context_ids.view(bsz * n_contexts, plen)
+            context_mask = context_mask.view(bsz * n_contexts, plen)
+            context_output = self.embed_text(
+                text_ids=context_ids,
+                text_mask=context_mask,
+                apply_mask=self.config.apply_context_mask,
+                extract_cls=self.config.extract_cls,
+            )
+    
+            score = torch.einsum(
+                'bd,bid->bi',
+                bug_output,
+                context_output.view(bsz, n_contexts, -1)
+            )
+            score = score / np.sqrt(bug_output.size(-1))
+            if gold_score is not None:
+                loss = self.kldivloss(score, gold_score)
+            else:
+                loss = None
+    
+            return bug_output, context_output, score, loss
+    
+        def embed_text(self, text_ids, text_mask, apply_mask=False, extract_cls=False):
+            text_output = self.model(
+                input_ids=text_ids,
+                attention_mask=text_mask if apply_mask else None
+            )
+            if type(text_output) is not tuple:
+                text_output.to_tuple()
+            text_output = text_output[0]
+            if self.config.projection:
+                text_output = self.proj(text_output)
+                text_output = self.norm(text_output)
 
-    def kldivloss(self, score, gold_score):
-        gold_score = torch.softmax(gold_score, dim=-1)
-        score = torch.nn.functional.log_softmax(score, dim=-1)
-        return self.loss_fct(score, gold_score)
+            if extract_cls:
+                text_output = text_output[:, 0]
+            else:
+                if apply_mask:
+                    text_output = text_output.masked_fill(~text_mask[:, :, None], 0.)
+                    text_output = torch.sum(text_output, dim=1) / torch.sum(text_mask, dim=1)[:, None]
+                else:
+                    text_output = torch.mean(text_output, dim=1)
+            return text_output
+        
+        def kldivloss(self, score, gold_score):
+            gold_score = torch.softmax(gold_score, dim=-1)
+            score = torch.nn.functional.log_softmax(score, dim=-1)
+            return self.loss_fct(score, gold_score)
+        
