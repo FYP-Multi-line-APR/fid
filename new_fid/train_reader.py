@@ -19,6 +19,7 @@ import src.evaluation
 import src.data
 import src.model
 from src.meta import MODEL_NAME
+from src.meta import NO_WORKERS
 
 
 def train(model, optimizer, scheduler, step, train_dataset, eval_dataset, opt, collator, best_dev_em, checkpoint_path):
@@ -37,7 +38,7 @@ def train(model, optimizer, scheduler, step, train_dataset, eval_dataset, opt, c
         sampler=train_sampler,
         batch_size=opt.per_gpu_batch_size,
         drop_last=True,
-        num_workers=10,
+        num_workers=NO_WORKERS,
         collate_fn=collator
     )
 
@@ -97,7 +98,7 @@ def evaluate(model, dataset, tokenizer, collator, opt):
         sampler=sampler,
         batch_size=opt.per_gpu_batch_size,
         drop_last=False,
-        num_workers=10,
+        num_workers=NO_WORKERS,
         collate_fn=collator
     )
     model.eval()

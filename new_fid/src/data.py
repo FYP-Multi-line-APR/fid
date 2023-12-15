@@ -32,7 +32,7 @@ class Dataset(torch.utils.data.Dataset):
     def __getitem__(self, index):
         example = self.data[index]
         bug_line = self.bug_line_prefix + " " + example['bug']
-        error = self.error_prefix + " " + example['error']
+        error = self.error_prefix + " " + example['err']
         target = self.get_target(example)
 
         if 'ctxs' in example and self.n_context is not None:
@@ -40,7 +40,7 @@ class Dataset(torch.utils.data.Dataset):
             f = self.code_context_prefix + " {}"
             contexts = example['ctxs'][:self.n_context]
             # code_contexts = [f.format(c['title'], c['text']) for c in contexts]
-            code_contexts = [f.format(c['text']) for c in contexts]
+            code_contexts = [f.format(c['txt']) for c in contexts]
             scores = [float(c['score']) for c in contexts]
             scores = torch.tensor(scores)
             # TODO(egrave): do we want to keep this?
@@ -49,6 +49,14 @@ class Dataset(torch.utils.data.Dataset):
         else:
             code_contexts, scores = None, None
 
+        # print({
+        #     'index' : index,
+        #     'bug' : bug_line,
+        #     'target' : target,
+        #     'error' :error,
+        #     'contexts': code_contexts,
+        #     'scores' : scores
+        # })
 
         return {
             'index' : index,
@@ -74,7 +82,8 @@ def encode_context(batch_code_context, tokenizer, max_length):
         p = tokenizer.batch_encode_plus(
             text_contexts,
             max_length=max_length,
-            pad_to_max_length=True,
+            # pad_to_max_length=True,
+            padding='max_length',
             return_tensors='pt',
             truncation=True
         )
@@ -98,7 +107,8 @@ class Collator(object):
         target = self.tokenizer.batch_encode_plus(
             target,
             max_length=self.fix_max_length if self.fix_max_length > 0 else None,
-            pad_to_max_length=True,
+            # pad_to_max_length=True,
+            padding='max_length',
             return_tensors='pt',
             truncation=True if self.fix_max_length > 0 else False,
         )
@@ -155,7 +165,8 @@ class RetrieverCollator(object):
         bug = [ex['bug'] for ex in batch]
         bug = self.tokenizer.batch_encode_plus(
             bug,
-            pad_to_max_length=True,
+            # pad_to_max_length=True,
+            padding='max_length',
             return_tensors="pt",
             max_length=self.bug_max_length,
             truncation=True
@@ -208,7 +219,8 @@ class TextCollator(object):
         index = [x[0] for x in batch]
         encoded_batch = self.tokenizer.batch_encode_plus(
             [x[1] for x in batch],
-            pad_to_max_length=True,
+            # pad_to_max_length=True,
+            padding='max_length',
             return_tensors="pt",
             max_length=self.max_length,
             truncation=True
