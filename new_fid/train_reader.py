@@ -156,7 +156,7 @@ if __name__ == "__main__":
     #load data
     # tokenizer = transformers.T5Tokenizer.from_pretrained(model_name)
 
-    tokenizer = transformers.AutoTokenizer.from_pretrained("Salesforce/codet5-small")
+    tokenizer = transformers.AutoTokenizer.from_pretrained(model_name)
     collator = src.data.Collator(opt.text_max_length, tokenizer, fix_max_length=opt.fix_max_length)
 
     # use golbal rank and world size to split the eval set on multiple gpus
@@ -175,6 +175,7 @@ if __name__ == "__main__":
     eval_dataset = src.data.Dataset(eval_examples, opt.n_context)
 
     if not checkpoint_exists and opt.model_path == "none":
+        # FIXME: load model from checkpoint not working
         t5 = transformers.T5ForConditionalGeneration.from_pretrained(model_name)
         model = src.model.FiDT5(t5.config)
         model.load_t5(t5.state_dict())
