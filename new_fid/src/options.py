@@ -38,7 +38,7 @@ class Options():
         self.parser.add_argument('--use_checkpoint', action='store_true', help='use checkpoint in the encoder')
         self.parser.add_argument('--text_max_length', type=int, default=512, 
                         help='maximum number of tokens in text segments (question+passage)')
-        self.parser.add_argument('--fix_max_length', type=int, default=-1, 
+        self.parser.add_argument('--fix_max_length', type=int, default=512, 
                         help='maximum number of tokens used to train the model, no truncation if -1')
         # self.parser.add_argument('--no_title', action='store_true', 
         #                 help='article titles not included in passages')
