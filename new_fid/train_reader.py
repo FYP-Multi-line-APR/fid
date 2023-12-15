@@ -154,8 +154,10 @@ if __name__ == "__main__":
     model_class = src.model.FiDT5
 
     #load data
-    tokenizer = transformers.T5Tokenizer.from_pretrained(model_name)
-    collator = src.data.Collator(opt.text_maxlength, tokenizer, answer_maxlength=opt.answer_maxlength)
+    # tokenizer = transformers.T5Tokenizer.from_pretrained(model_name)
+
+    tokenizer = transformers.AutoTokenizer.from_pretrained("Salesforce/codet5-small")
+    collator = src.data.Collator(opt.text_max_length, tokenizer, fix_max_length=opt.fix_max_length)
 
     # use golbal rank and world size to split the eval set on multiple gpus
     train_examples = src.data.load_data(

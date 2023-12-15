@@ -6,7 +6,7 @@ from torch import nn
 from torch.nn import CrossEntropyLoss
 import numpy as np
 
-import meta
+import src.meta
 
 class FiDT5(transformers.T5ForConditionalGeneration):
     def __init__(self, config):

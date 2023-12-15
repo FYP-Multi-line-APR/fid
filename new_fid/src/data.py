@@ -86,9 +86,9 @@ def encode_context(batch_code_context, tokenizer, max_length):
     return context_ids, context_mask.bool()
 
 class Collator(object):
-    def __init__(self, text_maxlength, tokenizer, fix_max_length=512):
+    def __init__(self, text_max_length, tokenizer, fix_max_length=512):
         self.tokenizer = tokenizer
-        self.text_maxlength = text_maxlength
+        self.text_max_length = text_max_length
         self.fix_max_length = fix_max_length
 
     def __call__(self, batch):
