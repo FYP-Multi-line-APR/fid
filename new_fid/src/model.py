@@ -129,6 +129,9 @@ class EncoderWrapper(torch.nn.Module):
     def __init__(self, encoder, use_checkpoint=False):
         super().__init__()
 
+         # key code
+        self.main_input_name = encoder.main_input_name
+
         self.encoder = encoder
         apply_checkpoint_wrapper(self.encoder, use_checkpoint)
 
