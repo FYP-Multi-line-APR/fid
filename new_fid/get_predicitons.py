@@ -6,10 +6,13 @@ from pathlib import Path
 from torch.utils.data import DataLoader, SequentialSampler
 from src.meta import MODEL_NAME
 from src.meta import NO_WORKERS
+
+import src.slurm
 import src.util
 from src.options import Options
 import src.data
 import src.model
+import src.evaluation
 
 def get_predictions(model, dataset, dataloader, tokenizer, opt):
     predictions = []
