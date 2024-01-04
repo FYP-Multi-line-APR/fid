@@ -74,6 +74,7 @@ def train(model, optimizer, scheduler, step, train_dataset, eval_dataset, opt, c
                 model.train()
                 if opt.is_main:
                     if dev_em > best_dev_em:
+                        print("saving best model - best development em: ", dev_em)
                         best_dev_em = dev_em
                         src.util.save(model, optimizer, scheduler, step, best_dev_em,
                                   opt, checkpoint_path, 'best_dev')
@@ -87,7 +88,7 @@ def train(model, optimizer, scheduler, step, train_dataset, eval_dataset, opt, c
                         tb_logger.add_scalar("Training", curr_loss / (opt.eval_freq), step)
                     curr_loss = 0.
 
-            print("step: ", step, "main : ", opt.is_main, "save_freq: ", opt.save_freq)
+            # print("step: ", step, "main : ", opt.is_main, "save_freq: ", opt.save_freq)
             if opt.is_main and step % opt.save_freq == 0:
                 print("model saving")
                 src.util.save(model, optimizer, scheduler, step, best_dev_em,
