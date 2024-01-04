@@ -87,7 +87,9 @@ def train(model, optimizer, scheduler, step, train_dataset, eval_dataset, opt, c
                         tb_logger.add_scalar("Training", curr_loss / (opt.eval_freq), step)
                     curr_loss = 0.
 
+            print("step: ", step, "main : ", opt.is_main, "save_freq: ", opt.save_freq)
             if opt.is_main and step % opt.save_freq == 0:
+                print("model saving")
                 src.util.save(model, optimizer, scheduler, step, best_dev_em,
                           opt, checkpoint_path, f"step-{step}")
             if step > opt.total_steps:
@@ -194,6 +196,8 @@ if __name__ == "__main__":
             src.util.load(model_class, opt.model_path, opt, reset_params=True)
         logger.info(f"Model loaded from {opt.model_path}")
 
+    print("=========================model loaded========================")
+    print("chekpoint set at: ", opt.use_checkpoint)
     model.set_checkpoint(opt.use_checkpoint)
 
     if opt.is_distributed:
