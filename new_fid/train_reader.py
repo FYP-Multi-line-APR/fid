@@ -73,6 +73,7 @@ def train(model, optimizer, scheduler, step, train_dataset, eval_dataset, opt, c
                 dev_em = evaluate(model, eval_dataset, tokenizer, collator, opt)
                 model.train()
                 if opt.is_main:
+                    print("dev_em: ", dev_em, "best_dev_em: ", best_dev_em)
                     if dev_em > best_dev_em:
                         print("saving best model - best development em: ", dev_em)
                         best_dev_em = dev_em
