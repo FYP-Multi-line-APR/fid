@@ -122,7 +122,7 @@ def evaluate(model, dataset, tokenizer, collator, opt):
 
             for k, o in enumerate(outputs):
                 fix = tokenizer.decode(o, skip_special_tokens=True)
-                gold = dataset.get_example(idx[k])['fix']
+                gold = dataset.get_example(idx[k])['fixes']
                 score = src.evaluation.ems(fix, gold)
                 total += 1
                 exactmatch.append(score)
