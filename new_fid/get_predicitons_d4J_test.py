@@ -88,12 +88,12 @@ if __name__ == "__main__":
 
     # logger = src.util.init_logger(opt.is_main, opt.is_distributed, Path(opt.checkpoint_dir) / opt.name / 'run.log')
     logger.info("Start getting predictions")
-    print("evaluation examples : ", eval_examples)
+    # print("evaluation examples : ", eval_examples)
     predictions = get_predictions(model, eval_dataset, eval_dataloader, tokenizer, opt)
     
 
     # Save predictions to a file
-    output_file = Path(opt.checkpoint_dir) / opt.name / 'predictions.txt'
+    output_file = Path(opt.checkpoint_dir) / opt.name / 'predictions.csv'
     # with open(output_file, 'w') as f:
     #     for idx, prediction in predictions:
     #         f.write(f"{idx}\t{prediction}\n")
@@ -102,11 +102,17 @@ if __name__ == "__main__":
     # csv data need to be in the format of 
     # eval_examples[idx]['id'], eval_examples[idx][bug], eval_examples[idx][fix],predictions[idx]
 
+    # Write header to CSV file
+    header = "id,bug,fix,prediction\n"
     with open(output_file, 'w') as f:
-        for idx, prediction in predictions:
-            f.write(f"{eval_examples[idx]['id']},{eval_examples[idx]['bug']},{eval_examples[idx]['fix']},{prediction}\n")
+        f.write(header)
+
+    # Write predictions to CSV file
+    for idx, prediction in predictions:
+        line = f"{eval_examples[idx]['id']},{eval_examples[idx]['bug']},{eval_examples[idx]['fix']},{prediction}\n"
+        with open(output_file, 'a') as f:
+            f.write(line)
 
 
-            
 
     logger.info(f'Predictions saved to {output_file}')
