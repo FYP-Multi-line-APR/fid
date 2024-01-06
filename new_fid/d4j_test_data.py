@@ -45,11 +45,11 @@ def main():
     combined_data = []
 
     for directory in all_directories:
-        directory_path = os.path.join(output_file, directory)
+        directory_path = os.path.join(root_dir, directory)
         directory_data = read_json_files(directory_path)
         combined_data.extend(directory_data)
 
-    combine_and_write_to_file(combined_data)
+    combine_and_write_to_file(combined_data,output_file=output_file)
 
 if __name__ == "__main__":
     main()
