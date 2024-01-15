@@ -125,7 +125,7 @@ if __name__ == "__main__":
     for idx, prediction in enumerate(predictions):
         line = [
             eval_examples[idx]["project"] + "-" + eval_examples[idx]["file"],
-            eval_examples[idx]['id'], eval_examples[idx]['bug'], eval_examples[idx]['fix'], prediction]
+            eval_examples[idx]['id'], eval_examples[idx]['bug'], eval_examples[idx]['fix'], prediction[1]]
 
         with open(output_file, 'a', newline='') as csvfile:
             csv_writer = csv.writer(csvfile)
