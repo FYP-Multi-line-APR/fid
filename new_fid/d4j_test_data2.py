@@ -15,7 +15,7 @@ def read_json_files(directory,specified_files=None):
     for json_file in json_files:
         if specified_files is not None:
             specified_file = project+"-"+json_file.split('.')[0]
-            if json_file not in specified_files:
+            if specified_file not in specified_files:
                 continue
             
         with open(os.path.join(directory, json_file), 'r') as f:
