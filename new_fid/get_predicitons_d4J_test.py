@@ -1,5 +1,5 @@
 # get_predictions.py
-
+import csv
 import torch
 import transformers
 from pathlib import Path
@@ -103,15 +103,31 @@ if __name__ == "__main__":
     # eval_examples[idx]['id'], eval_examples[idx][bug], eval_examples[idx][fix],predictions[idx]
 
     # Write header to CSV file
-    header = "id,bug,fix,prediction\n"
-    with open(output_file, 'w') as f:
-        f.write(header)
+    # header = "id,bug,fix,prediction\n"
+    # with open(output_file, 'w') as f:
+    #     f.write(header)
+
+    # # Write predictions to CSV file
+    # for idx, prediction in predictions:
+    #     line = f"{eval_examples[idx]['id']},{eval_examples[idx]['bug']},{eval_examples[idx]['fix']},{prediction}\n"
+    #     with open(output_file, 'a') as f:
+    #         f.write(line)
+
+
+    # Write header to CSV file
+    header = ["class","id", "bug", "fix", "prediction"]
+
+    with open(output_file, 'w', newline='') as csvfile:
+        csv_writer = csv.writer(csvfile)
+        csv_writer.writerow(header)
 
     # Write predictions to CSV file
-    for idx, prediction in predictions:
-        line = f"{eval_examples[idx]['id']},{eval_examples[idx]['bug']},{eval_examples[idx]['fix']},{prediction}\n"
-        with open(output_file, 'a') as f:
-            f.write(line)
+    for idx, prediction in enumerate(predictions):
+        line = [eval_examples["project"]+"-"+eval_examples["file"],eval_examples[idx]['id'], eval_examples[idx]['bug'], eval_examples[idx]['fix'], prediction]
+
+        with open(output_file, 'a', newline='') as csvfile:
+            csv_writer = csv.writer(csvfile)
+            csv_writer.writerow(line)
 
 
 
