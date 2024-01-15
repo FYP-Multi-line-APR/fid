@@ -123,7 +123,9 @@ if __name__ == "__main__":
 
     # Write predictions to CSV file
     for idx, prediction in enumerate(predictions):
-        line = [eval_examples["project"]+"-"+eval_examples["file"],eval_examples[idx]['id'], eval_examples[idx]['bug'], eval_examples[idx]['fix'], prediction]
+        line = [
+            eval_examples[idx]["project"] + "-" + eval_examples[idx]["file"],
+            eval_examples[idx]['id'], eval_examples[idx]['bug'], eval_examples[idx]['fix'], prediction]
 
         with open(output_file, 'a', newline='') as csvfile:
             csv_writer = csv.writer(csvfile)
