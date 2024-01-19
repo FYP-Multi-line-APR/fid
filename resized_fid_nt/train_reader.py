@@ -161,12 +161,12 @@ if __name__ == "__main__":
     model_class = src.model.FiDT5
 
     #load data
-    # tokenizer = transformers.T5Tokenizer.from_pretrained(model_name)
+    tokenizer = transformers.T5Tokenizer.from_pretrained(model_name)
 
-    if not checkpoint_exists and opt.model_path == "none":
-        tokenizer = transformers.AutoTokenizer.from_pretrained(model_name)
-        new_tokens = ["<BUG>", "</BUG>", "[DELETED]"]
-        tokenizer.add_tokens(new_tokens)
+    # if not checkpoint_exists and opt.model_path == "none":
+    #     tokenizer = transformers.AutoTokenizer.from_pretrained(model_name)
+    #     new_tokens = ["<BUG>", "</BUG>", "[DELETED]"]
+    #     tokenizer.add_tokens(new_tokens)
     
 
     collator = src.data.Collator(opt.text_max_length, tokenizer, fix_max_length=opt.fix_max_length)
