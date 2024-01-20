@@ -120,7 +120,7 @@ class Collator(object):
             if example['contexts'] is None:
                 print("no context check this out data.py")
                 return [example['bug']]
-            return [example['bug'] + " " + t for t in example['contexts']]
+            return [example['bug'] + " " +example["error"]+ " " + t for t in example['contexts']]
         text_context = [append_bug(example) for example in batch]
         context_ids, context_masks = encode_context(text_context,
                                                      self.tokenizer,
