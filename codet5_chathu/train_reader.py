@@ -117,7 +117,7 @@ def evaluate(model, dataset, tokenizer, collator, opt):
             outputs = model.generate(
                 input_ids=context_ids.cuda(),
                 attention_mask=context_mask.cuda(),
-                max_length=512
+                max_length=128
             )
 
             for k, o in enumerate(outputs):

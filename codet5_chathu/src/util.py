@@ -62,7 +62,12 @@ def save(model, optimizer, scheduler, step, best_eval_metric, opt, dir_path, nam
         "best_eval_metric": best_eval_metric,
     }
     torch.save(checkpoint, fp)
-    symlink_force(epoch_path, cp)
+    # symlink_force(epoch_path, cp)
+    # Example usage
+    try:
+        symlink_force(epoch_path, cp)
+    except Exception as e:
+        print(f"An error occurred: {e}")
 
 
 def load(model_class, dir_path, opt, reset_params=False):
