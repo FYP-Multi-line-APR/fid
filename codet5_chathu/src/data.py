@@ -198,8 +198,8 @@ class TextDataset(torch.utils.data.Dataset):
     def __init__(self,
                  data,
                 #  title_prefix='title:',
-                 error_prefix='err:',
-                 context_prefix='context:'):
+                 error_prefix='[ERROR]',
+                 context_prefix='[CONTEXT]'):
         self.data = data
         # self.title_prefix = title_prefix
         self.context_prefix = context_prefix
