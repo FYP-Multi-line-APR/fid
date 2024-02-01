@@ -94,7 +94,9 @@ if __name__ == "__main__":
     # Save predictions to a file
     output_file = Path(opt.checkpoint_dir) / opt.name / 'predictions.txt'
     with open(output_file, 'w') as f:
-        for idx, prediction in predictions:
+        idx =0 
+        for  prediction in predictions:
             f.write(f"{idx}\t{prediction}\n")
+            idx+=1
 
     logger.info(f'Predictions saved to {output_file}')
