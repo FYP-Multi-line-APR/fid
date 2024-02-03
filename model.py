@@ -268,27 +268,27 @@ class EncoderWrapper(torch.nn.Module):
 
         self.embed_tokens = self.encoder.embed_tokens
 
-    # def forward(self, input_ids=None, attention_mask=None, **kwargs,):
-    #     # total_length = n_contexts * context_length
-    #     bsz, total_length = input_ids.shape
-    #     context_length = total_length // self.n_contexts
-    #     input_ids = input_ids.view(bsz*self.n_contexts, context_length)
-    #     attention_mask = attention_mask.view(bsz*self.n_contexts, context_length)
-    #     outputs = self.encoder(input_ids, attention_mask, **kwargs)
-    #     outputs = (outputs[0].view(bsz, self.n_contexts*context_length, -1), ) + outputs[1:]
-    #     return outputs
-    def forward(self, input_ids=None, attention_mask=None, **kwargs):
-        print("[INFO]: encoder wrapper forward calling....")
+    def forward(self, input_ids=None, attention_mask=None, **kwargs,):
         # total_length = n_contexts * context_length
-        bsz, total_length = input_ids.shape[:2]  # Use indexing to get the first two dimensions
+        bsz, total_length = input_ids.shape
         context_length = total_length // self.n_contexts
-        input_ids = input_ids.view(bsz * self.n_contexts, context_length)
-        attention_mask = attention_mask.view(bsz * self.n_contexts, context_length)
+        input_ids = input_ids.view(bsz*self.n_contexts, context_length)
+        attention_mask = attention_mask.view(bsz*self.n_contexts, context_length)
         outputs = self.encoder(input_ids, attention_mask, **kwargs)
-        print("[INFO]: encoder wrapper output shape - 1:",outputs.shape)
-        outputs = (outputs[0].view(bsz, self.n_contexts * context_length, -1),) + outputs[1:]
-        print("[INFO]: encoder wrapper output shape - 2:",outputs.shape)
+        outputs = (outputs[0].view(bsz, self.n_contexts*context_length, -1), ) + outputs[1:]
         return outputs
+    # def forward(self, input_ids=None, attention_mask=None, **kwargs):
+    #     print("[INFO]: encoder wrapper forward calling....")
+    #     # total_length = n_contexts * context_length
+    #     bsz, total_length = input_ids.shape[:2]  # Use indexing to get the first two dimensions
+    #     context_length = total_length // self.n_contexts
+    #     input_ids = input_ids.view(bsz * self.n_contexts, context_length)
+    #     attention_mask = attention_mask.view(bsz * self.n_contexts, context_length)
+    #     outputs = self.encoder(input_ids, attention_mask, **kwargs)
+    #     print("[INFO]: encoder wrapper output shape - 1:",outputs.shape)
+    #     outputs = (outputs[0].view(bsz, self.n_contexts * context_length, -1),) + outputs[1:]
+    #     print("[INFO]: encoder wrapper output shape - 2:",outputs.shape)
+    #     return outputs
 
 
 class CheckpointWrapper(torch.nn.Module):

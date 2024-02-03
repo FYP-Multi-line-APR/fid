@@ -5,3 +5,143 @@ PROMPT: [
     ]]
 PROMPT: [['[BUG] final RandomVariable newNumberOfNumeraireAsset = amountOfNumeraireAsset.sub( underlyingAtEvaluationTime) ; [CONTEXT] final ArrayList<RandomVariable> basisFunctions = getRegressionBasisFunctionsBinning(underlyingAtTimeIndex, indicator); final ConditionalExpectationEstimator conditionalExpectationOperator = new MonteCarloConditionalExpectationRegression(basisFunctions.toArray(new RandomVariable[0])); delta = delta.getConditionalExpectation(conditionalExpectationOperator); final RandomVariable newNumberOfStocks = delta; final RandomVariable stocksToBuy = newNumberOfStocks.sub(amountOfUderlyingAsset); final RandomVariable numeraireAssetsToSell = stocksToBuy.mult(underlyingAtTimeIndex).div(numeraireAtTimeIndex); <extra_id_0> amountOfNumeraireAsset = newNumberOfNumeraireAsset; amountOfUderlyingAsset = newNumberOfStocks; } final RandomVariable underlyingAtEvaluationTime = model.getAssetValue(evaluationTime,0); final RandomVariable numeraireAtEvaluationTime = model.getNumeraire(evaluationTime); final RandomVariable portfolioValue = amountOfNumeraireAsset.mult(numeraireAtEvaluationTime)', '[BUG] final RandomVariable newNumberOfNumeraireAsset = amountOfNumeraireAsset.sub( underlyingAtEvaluationTime) ; [CONTEXT] import net.finmath.montecarlo.automaticdifferentiation.RandomVariableDifferentiable; import net.finmath.montecarlo.conditionalexpectation.MonteCarloConditionalExpectationRegression; import net.finmath.stochastic.ConditionalExpectationEstimator; import net.finmath.stochastic.RandomVariable; public class DeltaHedgedPortfolioWithAAD extends AbstractAssetMonteCarloProduct { private final AssetMonteCarloProduct productToReplicate; private int  numberOfRegressionFunctions = 20; private double lastOperationTimingValuation = Double.NaN; private double lastOperationTimingDerivative = Double.NaN; public DeltaHedgedPortfolioWithAAD(final AssetMonteCarloProduct productToReplicate, final int numberOfBins) { super(); this.productToReplicate = productToReplicate; this.numberOfRegressionFunctions = numberOfBins;']]
 PROMPT: [['[BUG] numeratorPolynomCoeff = new RandomVariable[] {values[null]}; [CONTEXT] interpolatingRationalFunctions = new RationalFunction[points.length-1]; for(int pointIndex = 0; pointIndex < points.length-1; pointIndex++ ) { RandomVariable[] numeratorPolynomCoeff; if (interpolationMethod == InterpolationMethod.PIECEWISE_CONSTANT_RIGHTPOINT) { numeratorPolynomCoeff = new RandomVariable[] {values[pointIndex+1]}; } else { <extra_id_0> } interpolatingRationalFunctions[pointIndex] = new RationalFunction(numeratorPolynomCoeff); } } private void doCreateRationalFunctionsForLinearInterpolation() {', '[BUG] numeratorPolynomCoeff = new RandomVariable[] {values[null]}; [CONTEXT] } public enum ExtrapolationMethod { DEFAULT, CONSTANT, LINEAR } private final double[] points; private final RandomVariable[] values; private InterpolationMethod interpolationMethod = InterpolationMethod.LINEAR; private ExtrapolationMethod extrapolationMethod = ExtrapolationMethod.DEFAULT; private static class RationalFunction { private final RandomVariable[] coefficientsNumerator; private final RandomVariable[] coefficientsDenominator;']]
+
+
+
+
+
+
+
+
+
+
+[BUG] return szenarios; 
+[CONTEXT] 
+@Override public double[] getStartPoint() {
+     return guessParameters; 
+} 
+@Override public double[] getLowerBound() {
+     <extra_id_0> 
+} 
+@Override public double[] getUpperBound() { 
+    return upperBound; 
+} 
+
+
+[BUG] return szenarios; 
+[CONTEXT] 
+public Map<String, Object> getBestParameters() {
+    return getBestParameters(null); 
+} 
+@Override public Map<String, Object> getBestParameters(final Map<String, Object> guess) {
+     class GARCHMaxLikelihoodFunction implements MultivariateFunction, Serializable {
+         private static final long serialVersionUID = 7072187082052755854L; 
+         @Override public double value(final double[] variables) { 
+            final double omega = variables[0]; final double alpha = variables[1];
+            final double beta = variables[2]; final double theta = variables[3];
+
+
+
+
+    {
+        "id":0,
+        "bug" : "int result = a / b;return result;",
+        "fix": "if (b != 0) {int result = a / b;return result;} else {throw new IllegalArgumentException(Denominator cannot be zero.);}",
+        "fixes": ["if (b != 0) {int result = a / b;return result;} else {throw new IllegalArgumentException(Denominator cannot be zero.);}"],
+        "err": "java.lang.ArithmeticException: / by zero\n\tat com.example.Main.divide(Main.java:6)\n\tat com.example.Main.main(Main.java:11)",
+        "ctxs": [
+                    {
+                        "txt": "public static int divide(int a, int b) {<BUG>int result = a / b</BUG>;return result;}"
+                    }
+                ]
+    }
+    ,
+    {
+        "id":1,
+        "bug" : "int result = divide(x, y); System.out.println(Result:  + result);",
+        "fix": "try {int result = divide(x, y);System.out.println(Result:  + result);} catch (IllegalArgumentException e) {System.out.println(Error:  + e.getMessage());}",
+        "fixes": ["try {int result = divide(x, y);System.out.println(Result:  + result);} catch (IllegalArgumentException e) {System.out.println(Error:  + e.getMessage());}"],
+        "err": "java.lang.ArithmeticException: / by zero\n\tat com.example.Main.divide(Main.java:6)\n\tat com.example.Main.main(Main.java:11)",
+        "ctxs": [
+                    {
+                        "txt": "public static void main(String[] args) {int x = 5;int y = 0;<BUG>int result = divide(x, y); System.out.println(Result:  + result);</BUG>} "
+                    },
+                    {
+                        "txt":"public static int divide(int a, int b) {if (b != 0) {int result = a / b;return result;} else {throw new IllegalArgumentException(Denominator cannot be zero.);}}"
+                    }
+            ]
+    }
+
+
+in semantic dependency
+
+
+
+[BUG]
+public int primeF(double initial, double alpha, double beta) {
+[CONTEXT]
+<extra_id_0>
+    double h = 0.01; 
+    double y = initial;
+    for (int i = 0; i < 100; i++) {
+        double y_prime = alpha * y + beta;
+        y = y + h * y_prime;
+    }
+    return y;
+}
+[ERROR]
+java: incompatible types: possible lossy conversion from double to int
+
+
+
+[BUG]
+int partialEntropy = primeF(x_value,beta_coefficient,beta_coefficient);
+[CONTEXT]
+public double primeF(double initial, double alpha, double beta) {
+    double h = 0.01; 
+    double y = initial;
+    for (int i = 0; i < 100; i++) {
+        double y_prime = alpha * y + beta;
+        y = y + h * y_prime;
+    }
+    return y;
+}
+[ERROR]
+java: incompatible types: possible lossy conversion from double to int
+
+
+[BUG]
+int partialEntropy = primeF(x_value,beta_coefficient,beta_coefficient);
+[CONTEXT]
+public double computeTotalEnergey(){
+    double x_value = 3.0;
+    double alpha_coefficient = 2.0;
+    double beta_coefficient = 1.5;
+    int gamma_coefficient = -3;
+
+    <extra_id_0>
+    return partialEntropy*gamma_coefficient;
+}
+[ERROR]
+java: incompatible types: possible lossy conversion from double to int
+
+
+
+
+
+double term1 = alpha * Math.pow(a, 2);
+double term2 = beta * Math.pow(b, 3);
+double term3 = gamma * c;
+
+// Numerator and denominator
+double numerator = term1 + term2 - term3;
+double denominator = alpha + beta + gamma;
+
+// Final result
+double result = numerator / denominator;
+return result;
+
+
+
+int gamma = alpha * 5; 
+
