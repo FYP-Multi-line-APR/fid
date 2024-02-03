@@ -80,7 +80,7 @@ in semantic dependency
 [BUG]
 public int primeF(double initial, double alpha, double beta) {
 [CONTEXT]
-<extra_id_0>
+<extra_id_0> --> public dobule primeF(double initial, double alpha, double beta) {
     double h = 0.01; 
     double y = initial;
     for (int i = 0; i < 100; i++) {
