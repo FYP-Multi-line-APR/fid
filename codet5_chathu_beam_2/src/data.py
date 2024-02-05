@@ -34,8 +34,12 @@ class Dataset(torch.utils.data.Dataset):
 
     def __getitem__(self, index):
         example = self.data[index]
+
+        if(example['bug']==None):
+            bug_line = self.bug_line_prefix + " " + ""
+
         bug_line = self.bug_line_prefix + " " + example['bug']
-        error = self.error_prefix + " " + example['err']
+        error = self.error_prefix + " " 
         target = self.get_target(example)
 
         if 'ctxs' in example and self.n_context is not None:
