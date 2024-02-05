@@ -14,6 +14,9 @@ import src.data
 import src.model
 import src.evaluation
 
+NUM_BEAMS = 10
+NUM_RETURN_SEQUENCES = 10
+
 def get_predictions(model, dataset, dataloader, tokenizer, opt):
     predictions = []
     model.eval()
@@ -28,11 +31,13 @@ def get_predictions(model, dataset, dataloader, tokenizer, opt):
                 input_ids=context_ids.cuda(),
                 attention_mask=context_mask.cuda(),
                 max_length=50,
+                num_beams=NUM_BEAMS,
+                num_return_sequences=NUM_RETURN_SEQUENCES
             )
 
             for k, o in enumerate(outputs):
                 ans = tokenizer.decode(o, skip_special_tokens=True)
-                predictions.append((idx[k], ans))
+                predictions.append( ans)
 
     return predictions
 
