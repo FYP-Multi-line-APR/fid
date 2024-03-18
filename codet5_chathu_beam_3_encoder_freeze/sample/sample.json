@@ -1,0 +1,30 @@
+[
+    {
+        "id":0,
+        "bug" : "int result = a / b;return result;",
+        "fix": "if (b != 0) {int result = a / b;return result;} else {throw new IllegalArgumentException(Denominator cannot be zero.);}",
+        "fixes": ["if (b != 0) {int result = a / b;return result;} else {throw new IllegalArgumentException(Denominator cannot be zero.);}"],
+        "err": "java.lang.ArithmeticException: / by zero\n\tat com.example.Main.divide(Main.java:6)\n\tat com.example.Main.main(Main.java:11)",
+        "ctxs": [
+                    {
+                        "txt": "public static int divide(int a, int b) {<BUG>int result = a / b</BUG>;return result;}"
+                    }
+                ]
+    }
+    ,
+    {
+        "id":1,
+        "bug" : "int result = divide(x, y); System.out.println(Result:  + result);",
+        "fix": "try {int result = divide(x, y);System.out.println(Result:  + result);} catch (IllegalArgumentException e) {System.out.println(Error:  + e.getMessage());}",
+        "fixes": ["try {int result = divide(x, y);System.out.println(Result:  + result);} catch (IllegalArgumentException e) {System.out.println(Error:  + e.getMessage());}"],
+        "err": "java.lang.ArithmeticException: / by zero\n\tat com.example.Main.divide(Main.java:6)\n\tat com.example.Main.main(Main.java:11)",
+        "ctxs": [
+                    {
+                        "txt": "public static void main(String[] args) {int x = 5;int y = 0;<BUG>int result = divide(x, y); System.out.println(Result:  + result);</BUG>} "
+                    },
+                    {
+                        "txt":"public static int divide(int a, int b) {if (b != 0) {int result = a / b;return result;} else {throw new IllegalArgumentException(Denominator cannot be zero.);}}"
+                    }
+            ]
+    }
+]
